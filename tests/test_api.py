@@ -36,6 +36,20 @@ def test_create_product(client, supplier):
     assert response.get_json()["supplier_name"] == "Test Supplier"
 
 
+def test_create_product_without_supplier(client):
+    response = client.post("/api/products", json={
+        "sku": "NO-SUP-001",
+        "name": "Unassigned Sensor",
+        "quantity": 10,
+        "reorder_level": 5,
+        "unit_price": 100,
+        "supplier_id": ""
+    })
+
+    assert response.status_code == 201
+    assert response.get_json()["supplier_name"] is None
+
+
 def test_list_products(client, product):
     response = client.get("/api/products")
 

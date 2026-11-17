@@ -181,7 +181,7 @@ def products():
         quantity = int(data.get("quantity", 0))
         reorder_level = int(data.get("reorder_level", 10))
         unit_price = float(data.get("unit_price", 0))
-        supplier_id = data.get("supplier_id")
+        supplier_id = data.get("supplier_id") or None
 
         if quantity < 0 or reorder_level < 0 or unit_price < 0:
             return error("Quantity, reorder level and price cannot be negative")
@@ -249,10 +249,13 @@ def product_detail(product_id):
                     value = float(value)
                     if value < 0:
                         return error("Price cannot be negative")
-                elif field == "supplier_id" and value is not None:
-                    value = int(value)
-                    if not db.session.get(Supplier, value):
-                        return error("Supplier not found", 404)
+                elif field == "supplier_id":
+                    if value in (None, ""):
+                        value = None
+                    else:
+                        value = int(value)
+                        if not db.session.get(Supplier, value):
+                            return error("Supplier not found", 404)
                 elif field in ["sku", "name"]:
                     value = str(value).strip()
                     if not value:
