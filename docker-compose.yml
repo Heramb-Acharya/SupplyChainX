@@ -1,0 +1,14 @@
+services:
+  supplychainx:
+    build: .
+    container_name: supplychainx
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+    volumes:
+      - supplychainx_data:/app/instance
+    restart: unless-stopped
+
+volumes:
+  supplychainx_data:
