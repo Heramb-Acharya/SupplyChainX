@@ -16,21 +16,14 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    set -e
-                    python3 -m venv .venv
-                    .venv/bin/pip install --upgrade pip
-                    .venv/bin/pip install -r requirements.txt
-                '''
-            }
-        }
-
         stage('Run Tests') {
             steps {
                 sh '''
-                    .venv/bin/python -m pytest -v --cov=app --cov-report=term
+                    docker run --rm \
+                        -v "$WORKSPACE:/app" \
+                        -w /app \
+                        python:3.12-slim \
+                        sh -c "pip install --no-cache-dir -r requirements.txt && python -m pytest -v --cov=app --cov-report=term"
                 '''
             }
         }
