@@ -5,7 +5,7 @@ pipeline {
         AWS_CLI = '/var/lib/jenkins/.local/bin/aws'
         AWS_REGION = 'us-east-1'
         TARGET_INSTANCE = 'i-051b29c7854e0977c'
-        APP_URL = 'http://34.207.235.9:8000'
+        APP_URL = 'http://54.172.116.3:8000'
     }
 
     stages {
