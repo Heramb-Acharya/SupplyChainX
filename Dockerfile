@@ -24,6 +24,7 @@ WORKDIR /app
 
 # Copy installed dependencies from builder
 COPY --from=builder /install /usr/local
+RUN python -m pip install --no-cache-dir --upgrade setuptools urllib3 msgpack
 
 # Copy application source
 COPY app ./app
