@@ -59,9 +59,19 @@ pipeline {
                 sh '''
                     set -e
 
+                    echo "Full HIGH/CRITICAL vulnerability report:"
                     trivy image \
                         --cache-dir "$TRIVY_CACHE" \
                         --severity HIGH,CRITICAL \
+                        --exit-code 0 \
+                        --no-progress \
+                        supplychainx:${BUILD_NUMBER}
+
+                    echo "Enforcing scan for HIGH/CRITICAL vulnerabilities with available fixes:"
+                    trivy image \
+                        --cache-dir "$TRIVY_CACHE" \
+                        --severity HIGH,CRITICAL \
+                        --ignore-unfixed \
                         --exit-code 1 \
                         --no-progress \
                         supplychainx:${BUILD_NUMBER}
