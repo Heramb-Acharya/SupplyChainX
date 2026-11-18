@@ -6,6 +6,7 @@ pipeline {
         AWS_REGION = 'us-east-1'
         TARGET_INSTANCE = 'i-051b29c7854e0977c'
         APP_URL = 'http://54.172.116.3:8000'
+        TRIVY_CACHE = '/tmp/supplychainx-trivy-cache'
     }
 
     stages {
@@ -32,6 +33,38 @@ pipeline {
             steps {
                 sh '''
                     docker build -t supplychainx:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Trivy Filesystem Scan') {
+            steps {
+                sh '''
+                    set -e
+                    mkdir -p "$TRIVY_CACHE"
+
+                    trivy fs \
+                        --cache-dir "$TRIVY_CACHE" \
+                        --scanners vuln,secret \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 1 \
+                        --no-progress \
+                        .
+                '''
+            }
+        }
+
+        stage('Trivy Docker Image Scan') {
+            steps {
+                sh '''
+                    set -e
+
+                    trivy image \
+                        --cache-dir "$TRIVY_CACHE" \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 1 \
+                        --no-progress \
+                        supplychainx:${BUILD_NUMBER}
                 '''
             }
         }
@@ -99,6 +132,9 @@ pipeline {
     }
 
     post {
+        always {
+            sh 'rm -rf "$TRIVY_CACHE" || true'
+        }
         success {
             echo 'SupplyChainX CI/CD pipeline completed successfully.'
         }
