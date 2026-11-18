@@ -24,7 +24,12 @@ WORKDIR /app
 
 # Copy installed dependencies from builder
 COPY --from=builder /install /usr/local
-RUN python -m pip install --no-cache-dir --upgrade setuptools urllib3 msgpack
+
+# Remove pip from the runtime image.
+# Dependency installation is completed in the builder stage.
+RUN rm -rf \
+    /usr/local/lib/python3.13/site-packages/pip \
+    /usr/local/lib/python3.13/site-packages/pip-*.dist-info
 
 # Copy application source
 COPY app ./app
